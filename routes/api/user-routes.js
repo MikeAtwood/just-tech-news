@@ -47,6 +47,29 @@ router.post('/', (req, res) => {
     });
 });
 
+router.post('/login', (req, res) => {
+  // expect {email: 'lernantino@gmail.com', password: 'password'}
+  User.findOne({
+    where: {
+      email: req.body.email,
+    }
+  }).then(dbUserData => {
+    if (!dbUserData) {
+      res.status(404).json({ message: 'No user found with this email address!' });
+      return;
+    }
+
+    //res.json({ user: dbUserData });
+
+    const validPassword = dbUserData.checkPassword(req.body.password);
+    if (!validPassword) {
+      res.status(404).json({ message: 'Incorrect password!' });
+      return;
+    }
+    res.json({ user: dbUserData, message: 'You are now logged in!' });
+  });
+});
+
 router.put('/:id', (req, res) => {
   // expects {username: 'Lernantino', email: 'lernantino@gmail.com', password: 'password1234'}
 
